@@ -1,0 +1,59 @@
+name: docker build
+
+on: [push]
+
+env:
+  USERNAME: maksimstojkovic
+  PROJECT: partkeepr
+  PLATFORMS: linux/amd64,linux/arm/v7,linux/arm64
+
+jobs:
+  buildx:
+    name: Build Multi-Platform Image and Upload to Docker Hub
+    runs-on: ubuntu-latest
+    steps:
+      -
+        name: Checkout Repo
+        uses: actions/checkout@v1
+
+      -
+        name: Setup Docker Buildx
+        run: |
+          # Build docker buildx from source
+          export DOCKER_BUILDKIT=1
+          docker build --platform=local -o . git://github.com/docker/buildx
+          mkdir -p ~/.docker/cli-plugins
+          mv buildx ~/.docker/cli-plugins/docker-buildx
+          # Docker version information
+          echo "DOCKER VERSION:"
+          docker info
+          echo "BUILDX VERSION:"
+          docker buildx version
+          # Install qemu-user-static container
+          docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+          docker buildx create --name builder --driver docker-container --use
+          docker buildx inspect --bootstrap
+      -
+        name: Build and Push
+        env:
+          DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
+          CR_TOKEN: ${{ secrets.CR_TOKEN }}
+        run: |
+          # Login
+          echo $DOCKER_TOKEN | docker login -u "$USERNAME" --password-stdin
+          # Setup build parameters
+          BUILD_PARAMS="--platform="$PLATFORMS" --build-arg VCS_REF=$(git rev-parse --short HEAD) --push"
+          # Build image as tagged version
+          TAG=$(date +%y.%m)
+          docker buildx build -t "$USERNAME"/"$PROJECT":"$TAG" $BUILD_PARAMS .
+          # Build image as latest version
+          TAG=latest
+          docker buildx build -t "$USERNAME"/"$PROJECT":"$TAG" $BUILD_PARAMS .
+          # Repeat with docker packages
+          echo $CR_TOKEN | docker login ghcr.io -u "$USERNAME" --password-stdin
+          # Build image as tagged version
+          TAG=$(date +%y.%m)
+          docker buildx build -t ghcr.io/"$USERNAME"/"$PROJECT":"$TAG" $BUILD_PARAMS .
+          # Build image as latest version
+          TAG=latest
+          docker buildx build -t ghcr.io/"$USERNAME"/"$PROJECT":"$TAG" $BUILD_PARAMS .
