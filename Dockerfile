@@ -59,10 +59,8 @@ RUN \
     chown -R www-data:www-data $APP_HOME /tmp/partkeepr.tbz2
 
 COPY config/nginx.conf /etc/nginx/conf.d/default.conf
-COPY config/crontab /etc/cronjobpartkeepr
+COPY config/crontab /etc/partkeepr.cron
 COPY php /usr/local/etc/php
 COPY scripts /usr/local/bin
 
 EXPOSE 80
-
-# ENTRYPOINT ["docker-php-entrypoint"]

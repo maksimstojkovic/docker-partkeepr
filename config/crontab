@@ -1,2 +1,2 @@
-0 0,6,12,18 * * * /usr/local/bin/php /app/app/console partkeepr:cron:run
-
+0 */6 * * * /usr/local/bin/php /partkeepr/app/console partkeepr:cron:run >> /partkeepr/app/logs/cron.log
+# Leave empty line at end of file

@@ -6,7 +6,7 @@ version: "3"
 services:
   database:
     image: mariadb:10.0
-    container_name: mariadb
+    container_name: partkeepr-database
     environment:
       - MYSQL_ROOT_PASSWORD=partkeepr_root
       - MYSQL_DATABASE=partkeepr
@@ -16,7 +16,7 @@ services:
       - ./partkeepr/mysql:/var/lib/mysql
     restart: unless-stopped
 
-  partkeepr:
+  web:
     image: maksimstojkovic/partkeepr:21.04
     container_name: partkeepr
     ports:
