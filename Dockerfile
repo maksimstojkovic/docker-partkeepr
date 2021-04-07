@@ -1,4 +1,6 @@
 FROM php:7.1-fpm-alpine
+LABEL maintainer="Maksim Stojkovic <docker@maksimstojkovic.com>"
+LABEL org.opencontainers.image.source https://github.com/maksimstojkovic/docker-partkeepr
 
 ENV PARTKEEPR_VERSION=1.4.0 APP_HOME=/partkeepr
 WORKDIR $APP_HOME
