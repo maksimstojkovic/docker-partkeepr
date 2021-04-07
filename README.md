@@ -12,7 +12,7 @@ Image of Partkeepr built using PHP7.1 and Nginx-fpm. Included `docker-compose.ym
 
 * `/partkeepr/app/config`: Partkeepr configuration folder.
 * `/partkeepr/data`: Partkeepr data folder.
-* `/partkeepr/data`: Partkeepr website root folder.
+* `/partkeepr/web`: Partkeepr website root folder.
 
 The Partkeepr setup page can be accessed from http://localhost:8080/setup after running the 
 container/compose stack.
