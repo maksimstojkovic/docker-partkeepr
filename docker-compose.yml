@@ -1,0 +1,30 @@
+version: "3"
+
+# Ensure host volumes give owner full permissions (e.g. in Linux or DSM)
+# Enable WSL filesystem metadata if required
+
+services:
+  database:
+    image: mariadb:10.0
+    container_name: mariadb
+    environment:
+      - MYSQL_ROOT_PASSWORD=partkeepr_root
+      - MYSQL_DATABASE=partkeepr
+      - MYSQL_USER=partkeepr
+      - MYSQL_PASSWORD=partkeepr
+    volumes:
+      - ./partkeepr/mysql:/var/lib/mysql
+    restart: unless-stopped
+
+  partkeepr:
+    image: maksimstojkovic/partkeepr:21.04
+    container_name: partkeepr
+    ports:
+      - "8080:80"
+    volumes:
+      - ./partkeepr/config:/partkeepr/app/config
+      - ./partkeepr/data:/partkeepr/data
+      - ./partkeepr/web:/partkeepr/web
+    depends_on:
+      - database
+    restart: unless-stopped

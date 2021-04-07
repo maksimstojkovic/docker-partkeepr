@@ -1,0 +1,64 @@
+#!/bin/sh
+
+set -e
+
+APP_HOME="/partkeepr"
+PARAMETERS_FILE="$APP_HOME/app/config/parameters.php"
+
+echo "Updating file ownership..."
+find "$APP_HOME" \( ! -user www-data -o ! -group www-data \) -exec chown www-data:www-data {} \;
+
+# copy base files on new container start
+if [ -f "/tmp/partkeepr.tbz2" ]; then
+	echo "New container detected, installing Partkeepr base files..."
+	sudo -u www-data tar \
+		-jxf /tmp/partkeepr.tbz2 \
+		-C "$APP_HOME" \
+		--exclude="partkeepr-$PARTKEEPR_VERSION/app/config" \
+		--exclude="partkeepr-$PARTKEEPR_VERSION/data" \
+		--exclude="partkeepr-$PARTKEEPR_VERSION/web" \
+		--strip-components=1
+fi
+
+# copy files to host volumes if required
+if [ ! -d "$APP_HOME/app/config" ] || [ -z "$(ls -A "$APP_HOME/app/config")" ]; then
+	echo "Copying app/config folder... "
+	sudo -u www-data tar \
+		-jxf /tmp/partkeepr.tbz2 \
+		-C "$APP_HOME" \
+		--strip-components=1 \
+		partkeepr-$PARTKEEPR_VERSION/app/config
+fi
+
+if [ ! -d "$APP_HOME/data" ] || [ -z "$(ls -A "$APP_HOME/data")" ]; then
+	echo "Copying data folder... "
+	sudo -u www-data tar \
+		-jxf /tmp/partkeepr.tbz2 \
+		-C "$APP_HOME" \
+		--strip-components=1 \
+		partkeepr-$PARTKEEPR_VERSION/data
+fi
+
+if [ ! -d "$APP_HOME/web" ] || [ -z "$(ls -A "$APP_HOME/web")" ]; then
+	echo "Copying web folder... "
+	sudo -u www-data tar \
+		-jxf /tmp/partkeepr.tbz2 \
+		-C "$APP_HOME" \
+		--strip-components=1 \
+		partkeepr-$PARTKEEPR_VERSION/web
+fi
+
+if [ ! -f "$APP_HOME/web/info.php" ]; then
+	echo "Copying web/info.php... "
+	cp /usr/local/etc/php/info.php "$APP_HOME/web/info.php"
+	chown www-data:www-data "$APP_HOME/web/info.php"
+	chmod 644 "$APP_HOME/web/info.php"
+fi
+
+echo "Generating parameters... "
+mkparameters > "$PARAMETERS_FILE"
+chown www-data:www-data "$PARAMETERS_FILE"
+chmod 644 "$PARAMETERS_FILE"
+
+echo "Cleaning up..."
+rm -rf /tmp/*
