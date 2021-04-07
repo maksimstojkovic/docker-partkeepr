@@ -52,11 +52,13 @@ if [ ! -f "$APP_HOME/web/info.php" ]; then
 	echo "Copying web/info.php... "
 	cp /usr/local/etc/php/info.php "$APP_HOME/web/info.php"
 	chown www-data:www-data "$APP_HOME/web/info.php"
+	chmod 644 "$APP_HOME/web/info.php"
 fi
 
 echo "Generating parameters... "
 mkparameters > "$PARAMETERS_FILE"
 chown www-data:www-data "$PARAMETERS_FILE"
+chmod 644 "$PARAMETERS_FILE"
 
 echo "Updating file permissions..."
 find "$APP_HOME" -type d -exec chmod 755 {} \;
