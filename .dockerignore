@@ -1,1 +1,8 @@
+.github
+.gitignore
+.dockerignore
+Dockerfile
+docker-compose
+LICENSE
 partkeepr
+README.md
