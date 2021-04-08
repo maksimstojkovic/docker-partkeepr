@@ -8,6 +8,8 @@
 
 Image of Partkeepr built using PHP7.1 and Nginx-fpm. Running the included `docker-compose.yml` creates a Partkeepr stack using MariaDB 10.0, with default database settings preconfigured in the Partkeepr setup page available at http://localhost:8080/setup (connect using hostname `database` in Partkeepr setup).
 
+This image supports the `amd64`, `arm64` and `armhf` platforms.
+
 ## Volumes
 
 * `/partkeepr/app/config`: Partkeepr configuration folder.
